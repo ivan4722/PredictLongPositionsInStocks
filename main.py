@@ -30,10 +30,9 @@ class RegressionStockLongPosition:
         grid_search = GridSearchCV(RandomForestClassifier(random_state=42), param_grid, cv=StratifiedKFold(n_splits=2, shuffle=True, random_state=42), scoring='accuracy')
         grid_search.fit(X_train_scaled, y_train)
         best_model = grid_search.best_estimator_
-        train_accuracy = grid_search.best_score_
-        return best_model, train_accuracy
+        return best_model
 
-    def plot_predictions(self):
+    def rolling_window_prediction(self):
         X = self.data.drop(['Target', 'Returns'], axis=1)
         y = self.data['Target']
 
@@ -42,27 +41,25 @@ class RegressionStockLongPosition:
         correct_predictions = 0
         total_predictions = 0
 
-        for i in range(0, len(X) - window_size, window_size):
-            X_train = X.iloc[i:i+window_size]
-            y_train = y.iloc[i:i+window_size]
-            X_test = X.iloc[i+window_size:i+window_size+1]
-            y_test = y.iloc[i+window_size:i+window_size+1]
+        for i in range(window_size, len(X)):
+            X_train = X.iloc[i-window_size:i]
+            y_train = y.iloc[i-window_size:i]
+            X_test = X.iloc[i:i+1]
 
-            model, train_accuracy = self.train_model(X_train, y_train)
+            model = self.train_model(X_train, y_train)
             X_test_scaled = self.scaler.transform(X_test)
-            test_accuracy = model.score(X_test_scaled, y_test)
-            predictions_model = model.predict(X_test_scaled)
-            correct_predictions += sum(predictions_model == y_test)
-            total_predictions += len(y_test)
             probability = model.predict_proba(X_test_scaled)[0]
-            if len(probability) == 1:
-                probability = probability[0]
-            else:
-                probability = probability[1]
-            predictions.append((X_test.index[0], probability))
-            print(f"Window {i}: Train Accuracy = {train_accuracy:.2f}, Test Accuracy = {test_accuracy:.2f}")
 
-        print(f"Model accuracy over all predictions: {correct_predictions / total_predictions:.2f}")
+            # Check if the probability array has two elements
+            if len(probability) == 2:
+                probability = probability[1]  # Probability of the positive class (taking a long position)
+            else:
+                probability = probability[0]  # If only one class is predicted, use the available probability
+
+            predictions.append((X_test.index[0], probability))
+
+            if i == len(X) - 1:  # Predicting for the most recent day
+                print(f"Predicted probability of taking a long position on {X_test.index[0].date()}: {probability:.2f}")
 
         predictions_df = pd.DataFrame(predictions, columns=['Date', 'Probability'])
 
@@ -75,7 +72,9 @@ class RegressionStockLongPosition:
         plt.ylabel("Price")
         plt.legend()
         plt.show()
+
+
 # Usage
-predictor = RegressionStockLongPosition("BAC", "2020-01-01", "2024-08-15")
+predictor = RegressionStockLongPosition("AAPL", "2020-01-01", "2024-08-18")
 predictor.get_data()
-predictor.plot_predictions()
+predictor.rolling_window_prediction()
