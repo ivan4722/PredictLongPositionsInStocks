@@ -36,7 +36,7 @@ class RegressionStockLongPosition:
         X = self.data.drop(['Target', 'Returns'], axis=1)
         y = self.data['Target']
 
-        window_size = 20  # 20 days = 1 month
+        window_size = 20  
         predictions = []
         correct_predictions = 0
         total_predictions = 0
@@ -50,15 +50,15 @@ class RegressionStockLongPosition:
             X_test_scaled = self.scaler.transform(X_test)
             probability = model.predict_proba(X_test_scaled)[0]
 
-            # Check if the probability array has two elements
+
             if len(probability) == 2:
-                probability = probability[1]  # Probability of the positive class (taking a long position)
+                probability = probability[1]  
             else:
-                probability = probability[0]  # If only one class is predicted, use the available probability
+                probability = probability[0]  
 
             predictions.append((X_test.index[0], probability))
 
-            if i == len(X) - 1:  # Predicting for the most recent day
+            if i == len(X) - 1: 
                 print(f"Predicted probability of taking a long position on {X_test.index[0].date()}: {probability:.2f}")
 
         predictions_df = pd.DataFrame(predictions, columns=['Date', 'Probability'])
@@ -74,7 +74,6 @@ class RegressionStockLongPosition:
         plt.show()
 
 
-# Usage
 predictor = RegressionStockLongPosition("AAPL", "2020-01-01", "2024-08-18")
 predictor.get_data()
 predictor.rolling_window_prediction()
