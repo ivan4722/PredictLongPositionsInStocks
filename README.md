@@ -71,6 +71,7 @@ Window 1120: Train Accuracy = 0.60, Test Accuracy = 1.00
 Model accuracy over all predictions: 0.74
 ```
 Overall, the model made the correct prediction 74% of the time (whether to long or not)
+![Stock Prediction Model Results](https://ix221-images.s3.us-east-2.amazonaws.com/BACpreds.png)
 
 EDIT:
 part of the README may be outdated, I changed the model to use a rolling window to predict possibility of taking a long position on a present day.
