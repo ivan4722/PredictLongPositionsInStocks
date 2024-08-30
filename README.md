@@ -57,20 +57,21 @@ This project implements a machine learning model that predicts whether a stock s
 
 - The test accuracy is either 0 or 1 because the model is predicting a binary target variable (long or not long).
 - A test accuracy of 1 indicates that the model made a correct prediction, while a test accuracy of 0 indicates an incorrect prediction.
+- A correct prediction is calculated as follows:
+  using ```prediction_days``` and ```threshold```, does the long generate a ```threshold```% profit after ```prediction_days``` days? 
 
 ## Results
 
 ```
-Window 220: Train Accuracy = 0.85, Test Accuracy = 0.00
-Window 240: Train Accuracy = 0.60, Test Accuracy = 1.00
-.
-.
-.
-Window 1100: Train Accuracy = 0.90, Test Accuracy = 1.00
-Window 1120: Train Accuracy = 0.60, Test Accuracy = 1.00
-Model accuracy over all predictions: 0.74
+Accuracy: 0.65
+Precision: 0.28
+Recall: 0.36
+F1 Score: 0.32
+AUC-ROC Score: 0.55
 ```
-Overall, the model made the correct prediction 74% of the time (whether to long or not)
+Using prediction days = 5 and threshold = 0.02 (2% profit)
+Overall, the model made the correct prediction 65% of the time (whether to long or not) with stock T
+It is important to note that T does not have an uptrend on our desired time frame (which would skew results)
 ![Stock Prediction Model Results](https://ix221-images.s3.us-east-2.amazonaws.com/BACpreds.png)
 
 EDIT:
